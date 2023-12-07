@@ -1,0 +1,275 @@
+---
+title: "Prevalence of Alcohol Use Characterized by Phosphatidylethanol in Patients with Respiratory Failure Before and During the COVID-19 Pandemic"
+author: "Ellen Burnham et al."
+format: 
+  html:
+    theme: default
+    code-fold: false
+    embed-resources: true
+    anchor-sections: false
+    df-print: paged
+---
+
+# Statistical Analysis: Figures and tables
+
+```{r}
+#| message: false
+#| wanring: false
+#| echo: false
+
+knitr::opts_chunk$set(echo=FALSE)
+
+library(kableExtra)
+library(tidyverse)
+
+source(here::here("Code/02_tables_12.R"))
+source(here::here("Code/03_table_3.R"))
+source(here::here("Code/04_figure_1.R"))
+# source(here::here("Code/05_figure_2.R")) ###commented because warning thrown
+source(here::here("Code/06_figure_3.R"))
+source(here::here("Code/07_supp_tables.R"))
+source(here::here("Code/08_supp_figures.R"))
+source(here::here("Code/09_sensitivity_specificity.R"))
+```
+
+<span style="color:red">**Key summary stats not shown in tables:**</span>
+
+- Proportion of patients with *available* AUDIT-C in pre-pandemic: **`r round(audit_c_avail_pre, 2)`**.
+- Proportion of patients with *available* in peri-pandemic: **`r round(audit_c_avail_peri, 2)`**.
+- Proportion of patients with *complete* PEth in pre-pandemic: **`r round(peth_avail_pre, 2)`**.
+- Proportion of patients with *complete* PEth in peri-pandemic: **`r round(peth_avail_peri, 3)`**.
+- Median PEth for zero-audit patients: **`r median_peth_zero_audit`**.
+- Median PEth for zero-audit patients in pre-pandemic: **`r median_peth_zero_audit_pre`**.
+- Median PEth for zero-audit patients in peri-pandemic: **`r median_peth_zero_audit_peri`**.
+
+## Table 1
+
+```{r}
+tab_demog_outcomes_strat
+```
+
+<span style="color:red">**Note: those with unknown race not counted as "Non-white".**</span>
+
+## Table 2
+
+```{r}
+tab_aud_strat
+```
+
+> AUDIT-C = alcohol use disorders identification test-C; PEth = phosphatidylethanol.
+
+## Table 3
+
+> Effects of alcohol misuse, defined by PEth, on selected ICU and hospital outcomes, in unadjusted analyses and after adjustment for covariates.
+
+::: {.panel-tabset}
+
+### Unadjusted (MI)
+
+```{r}
+tbl_all_unadj %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+### Adjusted (MI)
+
+```{r}
+tbl_all_adj %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+### Unadjusted (CC)
+
+```{r}
+fit_unadj_cc %>% 
+  mutate(p.value=CIDAtools::pvalr(p.value)) %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+### Adjusted (CC)
+
+```{r}
+fit_adj_cc %>% 
+  mutate(p.value=CIDAtools::pvalr(p.value)) %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+:::
+
+<span style="color:red">**Note: complete case (CC) for internal use only.**</span>
+
+## Figure 1
+
+![Figure 1: Phosphatidylethanol (PEth) measures among critically ill patients over time.  Data from 192 total patients with available PEth values, stratified by sex. Dashed line represents approximate start of the pandemic. ](../Figures/Figure1.png)
+
+## Figure 2
+
+![Figure 2: Relationship between PEth and demographic covariates of interest](../Figures/Figure2.png)
+
+## Figure 3
+
+![Figure 3: Relationship between PEth and AUDIT-C. Data from 133 patients with AUDIT-C and PEth (correlations and p-values obtained after multiple imputation).](../Figures/Figure3.png)
+
+We evaluated the association between PEth (log-scale) and AUDIT-C, stratified by pandemic phase, using multiply-imputed datasets and Pearson correlation.
+
+::: {.panel-tabset}
+
+### Using multiple imputation (MI)
+
+Using multiply-imputed data from the entire cohort, log-transformed PEth measures were correlated with AUDIT-C scores berfore the pandemic (Pearson’s rho=**0.58**, p<0.01), and during the pandemic (Pearson's rho=**0.28**, p=0.009). Correlations were significantly different between pandemic eras (p-value: **0.0011**).
+
+### Complete-case (CC) analysis
+
+Using complete cases from the entire cohort, log-transformed PEth measures were correlated with AUDIT-C scores berfore the pandemic (Pearson’s rho=**0.72**, p<0.01), and during the pandemic (Pearson's rho=**0.27**, p=0.016). Correlations were significantly different between pandemic eras (p-value: **< 0.001**).
+
+:::
+
+<span style="color:red">**Note: complete case (CC) for internal use only.**</span>
+
+## New Analysis: Sensitivity/Specificity of AUDIT-C
+
+We treated binarized PEth values (≥25 ng/mL) as the gold-standard predictor of alcohol misuse. We then compared the sensitivity, specificity, and predictive value of AUDIT-C as a diagnostic screener for alcohol misuse, both before and during the pandemic. The cut-point for AUDIT-C was ≥4 for males and ≥3 for females.
+
+Since datasets were multiply imputed, we aggregated results by assuming each operating characteristic (e.g. sensitivity) was normally distributed with standard error:
+
+$$
+SE(\hat{p})=\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}
+$$
+where $\hat{p}$ was the estimated value of the operating characteristic on a single imputed dataset. Using Rubin's rule (1987) for mutliply imputed data, we summarized the point estimate for each operating characteristic, as well as the 95% confidence interval.
+
+```{r}
+tab_sens_spec %>%
+  kable(table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+During the pandemic, both the specificity and PPV of AUDIT-C improved, though the confidence intervals for wpecificity were overlapping across pandemic eras. The improvement in PPV was driven, at least in part, by greater prevalence of high PEth during the pandemic.
+
+Sensitivity of AUDIT-C declined from 0.458 to 0.172. Thus, AUDIT-C was less likely to identify alcohol users (i.e., those who had high PEth), during the pandemic.
+
+Similarly, negative predicted value (NPV) declined from 0.679 to 0.127 during the pandemic, meaning a large proportion of those with low AUDIT-C also had high PEth and went undetected.
+
+# Supplemental Analyses
+
+## Supplemental Figure 1
+
+![Supplemental Figure 1. AUDIT-C scores among critically ill patients over time. Data from 158 total patients, stratified by sex. Dashed line represents approximate start of the pandemic.](../Figures/SupplementalFigure1.png)
+
+## Supplemental Table 1
+
+> Relationship between PEth and covariates of interest.
+
+```{r}
+tbl_peth_covar %>%
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+> Estimates from a model with PEth treated as a continuous outcome, using ordinal regression to handle the non-normality in the distribution of PEth. Results obtained from 5 multiply-imputed data sets. APACHE = Acute Physiology and Chronic Health Evaluation.
+
+## Supplemental Table 2
+
+> Sensitivity analysis to determine effects of alcohol misuse, defined by PEth (trichotomized values), on selected ICU and hospital outcomes, in unadjusted analyses and after adjustment for covariates
+
+::: {.panel-tabset}
+
+### Unadjusted
+
+```{r}
+tbl_s2_unadj %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+### Adjusted
+
+```{r}
+tbl_s2_adj %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+:::
+
+> The above estimates are the effects of alcohol misuse defined by PEth. PEth < 20 ng/mL was considered “light or no consumption” (i.e. abstinence to < 2 drinks/day, several days per week), and served as the referent group. Patients with PEth 20-199 ng/mL was considered “significant consumption” (i.e. consuming 2-4 drinks/day, several days per week). Patients with PEth ≥ 200 ng/mL was considered “heavy consumption”, (i.e. consuming at least 4 drinks/day, several days per week). Adjusted effects were estimated from models with covariates including: age, sex, race, ethnicity, APACHE II, diabetes, cirrhosis, current smoking, and COVID status. OR is the odds ratio (with 95% confidence interval) of having higher values of the outcome (e.g., the odds ratio of staying on a ventilator for a greater number of days). PEth results were pooled from five multiply imputed datasets to categorize patients as alcohol misuse versus no alcohol misuse at the 25 ng/mL threshold. 
+
+## Supplemental Table 3
+
+> Sensitivity analysis to determine effects of alcohol misuse, defined by AUDIT-C scores, on selected ICU and hospital outcomes, in unadjusted analyses and after adjustment for covariates.
+
+::: {.panel-tabset}
+
+### Unadjusted
+
+```{r}
+tbl_s3_unadj %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+### Adjusted
+
+```{r}
+tbl_s3_adj %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+:::
+
+> The above estimates are the effects of alcohol misuse defined by AUDIT-C ≥4  (yes versus no). Adjusted effects were estimated from models with covariates including: age, sex, race, ethnicity, APACHE II, diabetes, cirrhosis, current smoking, and COVID status. OR is the odds ratio (with 95% confidence interval) of having higher values of the outcome (e.g., the odds ratio of staying on a ventilator for a greater number of days). PEth results were pooled from five multiply imputed datasets to categorize patients as alcohol misuse versus no alcohol misuse at the 25 ng/mL threshold.
+
+<span style="color:red">**Note: AUDIT-C threshold was ≥4 for males, ≥3 for females.**</span>
+
+## Supplemental Table 4
+
+> Relationship between Alcohol Misuse and Days on Mechanical Ventilation
+
+```{r}
+tbl_s4 %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+> PEth results used to define alcohol misuse by PEth obtained from 5 multiply-imputed data sets. APACHE = Acute Physiology and Chronic Health Evaluation.
+
+## Supplemental Table 5
+
+> Relationship between Alcohol Misuse and Days in ICU
+
+```{r}
+tbl_s5 %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+> PEth results used to define alcohol misuse by PEth obtained from 5 multiply-imputed data sets. APACHE = Acute Physiology and Chronic Health Evaluation.
+
+## Supplemental Table 6
+
+> Relationship between Alcohol Misuse and In-hospital Mortality 
+
+```{r}
+tbl_s6 %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+> PEth results used to define alcohol misuse by PEth obtained from 5 multiply-imputed data sets. APACHE = Acute Physiology and Chronic Health Evaluation.
+
+## Supplemental Table 7
+
+> Relationship between Alcohol Misuse and Discharge Home (yes or no)
+
+```{r}
+tbl_s7 %>% 
+  kable(digits=2, table.attr='data-quarto-disable-processing="true"') %>% 
+  kable_minimal(full_width=F)
+```
+
+
+
