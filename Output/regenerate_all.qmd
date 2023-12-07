@@ -22,14 +22,14 @@ knitr::opts_chunk$set(echo=FALSE)
 library(kableExtra)
 library(tidyverse)
 
-source(here::here("Code/02_tables_12.R"))
-source(here::here("Code/03_table_3.R"))
-source(here::here("Code/04_figure_1.R"))
-# source(here::here("Code/05_figure_2.R")) ###commented because warning thrown
-source(here::here("Code/06_figure_3.R"))
-source(here::here("Code/07_supp_tables.R"))
-source(here::here("Code/08_supp_figures.R"))
-source(here::here("Code/09_sensitivity_specificity.R"))
+source(here::here("Scripts/02_tables_12.R"))
+source(here::here("Scripts/03_table_3.R"))
+source(here::here("Scripts/04_figure_1.R"))
+source(here::here("Scripts/05_figure_2.R")) 
+source(here::here("Scripts/06_figure_3.R"))
+source(here::here("Scripts/07_supp_tables.R"))
+source(here::here("Scripts/08_supp_figures.R"))
+source(here::here("Scripts/09_sensitivity_specificity.R"))
 ```
 
 <span style="color:red">**Key summary stats not shown in tables:**</span>
